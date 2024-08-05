@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marriage Certificate Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        
+        .form-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h2 {
+            margin-top: 0;
+        }
+        
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        
+        input[type="text"],
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="form-container">
+        <h2>Fill the details to generate Marriage Certificate / विवाह प्रमाणपत्र जनरेट करण्यासाठी तपशील भरा</h2>
+        <form id="marriageForm" enctype="multipart/form-data">
+            <label for="husbandName">Husband's Name / पतीचे नाव:</label>
+            <input type="text" id="husbandName" name="husbandName" required>
+
+            <label for="husbandAadhar">Husband's Aadhar Card Number / पतीचा आधार कार्ड नंबर:</label>
+            <input type="text" id="husbandAadhar" name="husbandAadhar" required>
+
+            <label for="husbandResidence">Husband's Residing at / पतीचा निवास:</label>
+            <input type="text" id="husbandResidence" name="husbandResidence" required>
+
+            <label for="wifeName">Wife's Name / पत्नीचे नाव:</label>
+            <input type="text" id="wifeName" name="wifeName" required>
+
+            <label for="wifeAadhar">Wife's Aadhar Card Number / पत्नीचा आधार कार्ड नंबर:</label>
+            <input type="text" id="wifeAadhar" name="wifeAadhar" required>
+
+            <label for="husbandPhoto">Husband's Photo / पतीचा फोटो:</label>
+            <input type="file" id="husbandPhoto" name="husbandPhoto" accept="image/*">
+
+            <label for="wifePhoto">Wife's Photo / पत्नीचा फोटो:</label>
+            <input type="file" id="wifePhoto" name="wifePhoto" accept="image/*">
+
+            <label for="marriageDate">Solemnized on / विवाह दिनांक:</label>
+            <input type="text" id="marriageDate" name="marriageDate" required>
+
+            <label for="registeredDate">Registered on / नोंदणीकृत दिनांक:</label>
+            <input type="text" id="registeredDate" name="registeredDate" required>
+
+            <label for="volume">Volume / खंड:</label>
+            <input type="text" id="volume" name="volume" required>
+
+            <label for="serialNo">Serial No. / क्रमांक:</label>
+            <input type="text" id="serialNo" name="serialNo" required>
+
+            <label for="dateOfIssue">Date of issue / जारी केलेला दिनांक:</label>
+            <input type="text" id="dateOfIssue" name="dateOfIssue" required>
+
+            <button type="submit">Submit / सबमिट करा</button>
+        </form>
+    </div>
+    <script>
+        const scriptURL = 'https://script.google.com/macros/s/AKfycby_NvdRcStIreOP4oTyJ1YjkGKKzTJreKIQqDGGhSjh2ROmMuzhUeqsi2haRE9DLgqm/exec'; // Replace with your Google Apps Script web app URL
+        const form = document.getElementById('marriageForm');
+
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const husbandPhotoFile = document.getElementById('husbandPhoto').files[0];
+            const wifePhotoFile = document.getElementById('wifePhoto').files[0];
+
+            const readerHusband = new FileReader();
+            readerHusband.onloadend = function() {
+                formData.append('husbandPhoto', readerHusband.result.split(',')[1]);
+                formData.append('husbandPhotoName', husbandPhotoFile.name);
+
+                const readerWife = new FileReader();
+                readerWife.onloadend = function() {
+                    formData.append('wifePhoto', readerWife.result.split(',')[1]);
+                    formData.append('wifePhotoName', wifePhotoFile.name);
+
+                    fetch(scriptURL, {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'Success') {
+                                alert('Form submitted successfully. / फॉर्म यशस्वीपणे सबमिट केला गेला आहे.');
+                                window.location.href = 'index.html'; // Redirect after successful submission
+                            } else {
+                                alert('Error submitting form: ' + data.message + ' / फॉर्म सबमिट करण्यात त्रुटी: ' + data.message);
+                            }
+                        })
+                        .catch(error => {
+                            alert('Error submitting form: ' + error.message + ' / फॉर्म सबमिट करण्यात त्रुटी: ' + error.message);
+                        });
+                };
+                readerWife.readAsDataURL(wifePhotoFile);
+            };
+            readerHusband.readAsDataURL(husbandPhotoFile);
+        });
+    </script>
+</body>
+
+</html>
